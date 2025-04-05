@@ -18,3 +18,39 @@ model Post {
 
     @@index([name])
 }
+
+model Movement {
+    id        Int      @id @default(autoincrement())
+    weight    Float
+    reps      Int
+    note      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Action   Action @relation(fields: [actionId], references: [id], onDelete: Cascade)
+    actionId Int
+
+    @@index([weight])
+}
+
+model Action {
+    id         Int        @id @default(autoincrement())
+    name       String
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+    template   Template   @relation(fields: [templateId], references: [id], onDelete: Cascade)
+    templateId Int
+    movements  Movement[]
+
+    @@index([name])
+}
+
+model Template {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    actions   Action[]
+
+    @@index([name])
+}
