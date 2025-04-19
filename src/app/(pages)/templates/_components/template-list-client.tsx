@@ -2,15 +2,15 @@
 
 import { api } from '@/trpc/react';
 import Link from 'next/link';
+import React, { useState } from 'react';
 import type { RouterOutputs } from '@/trpc/react';
-import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { toast } from 'sonner';
+import { useViewportStore } from '@/store/viewport';
+import { useRouter } from 'next/navigation';
 
 type Template = RouterOutputs['template']['getAll'][number];
 
@@ -20,20 +20,21 @@ interface TemplateListClientProps {
 
 export function TemplateListClient({ initialTemplates }: TemplateListClientProps) {
   const utils = api.useUtils();
+  const router = useRouter();
+  const { dvh } = useViewportStore();
+  const [templateName, setTemplateName] = useState('');
 
-  // 使用initialTemplates作为初始数据
-  const {
-    data: templates,
-    isLoading,
-    error,
-  } = api.template.getAll.useQuery(undefined, {
+  // 使用服务端获取的数据作为初始数据
+  const { data: templates } = api.template.getAll.useQuery(undefined, {
     initialData: initialTemplates,
+    enabled: false, // 禁用自动获取
   });
 
   const createTemplate = api.template.create.useMutation({
     onSuccess: async () => {
-      form.reset();
-      await utils.template.getAll.invalidate();
+      setTemplateName(''); // 重置输入
+      await utils.template.getAll.invalidate(); // 刷新模板列表
+      router.refresh(); // 强制页面刷新以获取最新的服务端数据
       toast.success('模板创建成功');
     },
     onError: (e) => {
@@ -44,6 +45,7 @@ export function TemplateListClient({ initialTemplates }: TemplateListClientProps
   const deleteTemplate = api.template.delete.useMutation({
     onSuccess: async () => {
       await utils.template.getAll.invalidate();
+      router.refresh(); // 强制页面刷新以获取最新的服务端数据
       toast.success('模板删除成功');
     },
     onError: (e) => {
@@ -51,73 +53,42 @@ export function TemplateListClient({ initialTemplates }: TemplateListClientProps
     },
   });
 
-  // 使用react-hook-form管理表单
-  const form = useForm({
-    defaultValues: {
-      name: '',
-    },
-  });
-
-  function onSubmit(values: { name: string }) {
-    createTemplate.mutate({ name: values.name });
+  // 简化的表单提交处理
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (templateName.trim()) {
+      createTemplate.mutate({ name: templateName });
+    }
   }
 
   return (
-    <div className='container mx-auto py-8 px-4'>
+    <div
+      className='container mx-auto py-8 px-4 overflow-auto'
+      style={{
+        height: 100 * dvh,
+      }}>
       <h1 className='text-2xl font-bold mb-6'>训练模板</h1>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className='mb-8 flex gap-2'>
-          <FormField
-            control={form.control}
-            name='name'
-            render={({ field }) => (
-              <FormItem className='flex-1 max-w-sm'>
-                <FormControl>
-                  <Input
-                    placeholder='模板名称'
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <Button
-            type='submit'
-            disabled={createTemplate.isPending || !form.watch('name')?.trim()}
-            className='shrink-0'>
-            {createTemplate.isPending ? '创建中...' : '创建模板'}
-          </Button>
-        </form>
-      </Form>
+
+      {/* 简化的表单 */}
+      <form
+        onSubmit={handleSubmit}
+        className='mb-8 flex gap-2'>
+        <Input
+          placeholder='模板名称'
+          value={templateName}
+          onChange={(e) => setTemplateName(e.target.value)}
+          className='flex-1 max-w-sm'
+        />
+        <Button
+          type='submit'
+          disabled={createTemplate.isPending || !templateName.trim()}
+          className='shrink-0'>
+          {createTemplate.isPending ? '创建中...' : '创建模板'}
+        </Button>
+      </form>
 
       <div className='grid grid-cols-2 gap-4'>
-        {isLoading ? (
-          // 使用Skeleton组件优化加载状态
-          Array.from({ length: 2 }).map((_, index) => (
-            <Card
-              key={index}
-              className='overflow-hidden'>
-              <CardHeader>
-                <Skeleton className='h-6 w-3/4' />
-                <Skeleton className='h-4 w-1/2 mt-2' />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className='h-4 w-1/4' />
-              </CardContent>
-              <CardFooter className='flex justify-between'>
-                <Skeleton className='h-9 w-24' />
-                <Skeleton className='h-9 w-16' />
-              </CardFooter>
-            </Card>
-          ))
-        ) : error ? (
-          <div className='col-span-2 text-center py-8'>
-            <p className='text-destructive mb-2'>加载模板出错</p>
-            <p className='text-sm text-muted-foreground'>{error.message}</p>
-          </div>
-        ) : templates?.length === 0 ? (
+        {templates.length === 0 ? (
           <div className='col-span-2 text-center py-12'>
             <p className='text-lg mb-2'>没有找到模板</p>
             <p className='text-sm text-muted-foreground mb-4'>创建您的第一个模板开始使用！</p>

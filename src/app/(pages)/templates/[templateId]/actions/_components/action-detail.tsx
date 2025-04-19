@@ -90,9 +90,7 @@ export function ActionDetail({ actionId }: ActionDetailProps) {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
               <FormField
                 control={form.control}
                 name='weight'
@@ -147,11 +145,12 @@ export function ActionDetail({ actionId }: ActionDetailProps) {
                 <Button
                   type='submit'
                   className='w-full'
-                  disabled={createMovement.isPending}>
+                  disabled={createMovement.isPending}
+                  onClick={form.handleSubmit(onSubmit)}>
                   {createMovement.isPending ? '记录中...' : '记录'}
                 </Button>
               </div>
-            </form>
+            </div>
           </Form>
         </CardContent>
       </Card>
