@@ -1,6 +1,5 @@
 {
     "buildCommand": "npm run build",
     "devCommand": "npm run dev",
-    "installCommand": "npm install --force",
-    "ignoreCommand": "npx npm-force-resolutions"
+    "installCommand": "npm install --force"
 }
