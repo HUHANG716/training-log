@@ -1,10 +1,11 @@
 import { api } from '@/trpc/server';
 import { TemplateDetail } from './_components/template-detail';
 
-export default async function TemplatePage({ params }: { params: { templateId: string } }) {
-  const templateId = Number(params.templateId);
+// Updated the function signature to match Next.js PageProps interface
+export default async function TemplatePage({ params }: { params: Promise<{ templateId: string }> }) {
+  const { templateId } = await params;
   const initialData = await api.template.getById({
-    id: templateId,
+    id: Number(templateId),
   });
 
   if (!initialData) {
