@@ -8,14 +8,12 @@ import { Input } from '@/components/ui/input';
 import { CardContent } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
 import { PlusIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 type AddActionFormProps = {
   templateId: number;
 };
 
 export function AddActionForm({ templateId }: AddActionFormProps) {
-  const router = useRouter();
   const utils = api.useUtils();
 
   // 使用react-hook-form管理动作表单
@@ -30,7 +28,6 @@ export function AddActionForm({ templateId }: AddActionFormProps) {
       actionForm.reset();
       // 刷新模板数据
       await utils.template.getById.invalidate({ id: templateId });
-      router.refresh(); // 强制页面刷新以获取最新的服务端数据
       toast.success('动作创建成功');
     },
     onError: (e) => {

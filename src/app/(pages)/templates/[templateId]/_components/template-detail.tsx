@@ -28,11 +28,7 @@ export function TemplateDetail({ initialTemplate }: Props) {
   const templateId = initialTemplate.id;
 
   // 使用服务端获取的数据作为初始数据
-  const {
-    data: template,
-    isLoading,
-    isError,
-  } = api.template.getById.useQuery(
+  const { data: template, isError } = api.template.getById.useQuery(
     { id: templateId },
     {
       initialData: initialTemplate,
@@ -63,20 +59,6 @@ export function TemplateDetail({ initialTemplate }: Props) {
     createAction.mutate({ name: values.name, templateId });
   }
 
-  // 加载状态显示
-  if (isLoading) {
-    return (
-      <div className='container mx-auto py-8 px-4'>
-        <Skeleton className='h-10 w-40 mb-6' />
-        <Skeleton className='h-24 w-full mb-4' />
-        <div className='space-y-4'>
-          <Skeleton className='h-40 w-full' />
-          <Skeleton className='h-40 w-full' />
-        </div>
-      </div>
-    );
-  }
-
   // 错误状态处理
   if (isError || !template) {
     return redirect('/templates');
@@ -94,7 +76,7 @@ export function TemplateDetail({ initialTemplate }: Props) {
       </div>
 
       <Card className='mb-4 border-dashed'>
-        <CardContent className='pt-6'>
+        <CardContent>
           <Form {...actionForm}>
             <form
               onSubmit={actionForm.handleSubmit(onSubmitAction)}

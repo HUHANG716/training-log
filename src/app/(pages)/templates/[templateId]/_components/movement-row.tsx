@@ -67,7 +67,7 @@ export function MovementRow(props: MovementRowProps) {
     );
   } else {
     // 创建模式
-    const { templateId, actionId, handleCreate } = props;
+    const { handleCreate } = props;
 
     // 创建模式下的本地状态，初始值设为空字符串
     const [newMovementData, setNewMovementData] = useState({
@@ -120,7 +120,6 @@ export function MovementRow(props: MovementRowProps) {
             value={newMovementData.weight}
             onChange={(e) => handleNewDataChange('weight', e.target.value)}
             className={isInvalid && newMovementData.weight === '' ? 'border-red-500' : ''}
-            placeholder='重量'
           />
         </TableCell>
         <TableCell>
@@ -129,7 +128,6 @@ export function MovementRow(props: MovementRowProps) {
             value={newMovementData.reps}
             onChange={(e) => handleNewDataChange('reps', e.target.value)}
             className={isInvalid && newMovementData.reps === '' ? 'border-red-500' : ''}
-            placeholder='次数'
           />
         </TableCell>
         <TableCell>
@@ -137,8 +135,6 @@ export function MovementRow(props: MovementRowProps) {
             type='text'
             value={newMovementData.note}
             onChange={(e) => handleNewDataChange('note', e.target.value)}
-            className='w-full'
-            placeholder='备注'
           />
         </TableCell>
         <TableCell className='text-right'>

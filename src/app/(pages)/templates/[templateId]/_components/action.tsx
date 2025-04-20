@@ -1,7 +1,7 @@
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api, type RouterOutputs } from '@/trpc/react';
-import { DeleteActionButton } from '@/app/(pages)/templates/[templateId]/_components/delete-action-button';
+import { DeleteActionButton } from '@/app/(pages)/templates/[templateId]/_components/action/delete-action-button';
 import MovementList from './movement-form';
 
 type Props = {

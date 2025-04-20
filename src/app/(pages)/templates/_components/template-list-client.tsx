@@ -27,14 +27,12 @@ export function TemplateListClient({ initialTemplates }: TemplateListClientProps
   // 使用服务端获取的数据作为初始数据
   const { data: templates } = api.template.getAll.useQuery(undefined, {
     initialData: initialTemplates,
-    enabled: false, // 禁用自动获取
   });
 
   const createTemplate = api.template.create.useMutation({
     onSuccess: async () => {
       setTemplateName(''); // 重置输入
-      await utils.template.getAll.invalidate(); // 刷新模板列表
-      router.refresh(); // 强制页面刷新以获取最新的服务端数据
+      await utils.template.getAll.invalidate();
       toast.success('模板创建成功');
     },
     onError: (e) => {
@@ -45,7 +43,6 @@ export function TemplateListClient({ initialTemplates }: TemplateListClientProps
   const deleteTemplate = api.template.delete.useMutation({
     onSuccess: async () => {
       await utils.template.getAll.invalidate();
-      router.refresh(); // 强制页面刷新以获取最新的服务端数据
       toast.success('模板删除成功');
     },
     onError: (e) => {
@@ -101,7 +98,7 @@ export function TemplateListClient({ initialTemplates }: TemplateListClientProps
               className='overflow-hidden'>
               <CardHeader>
                 <CardTitle>{template.name}</CardTitle>
-                <p className='text-sm text-muted-foreground'>创建于 {new Date(template.createdAt).toLocaleDateString()}</p>
+                <p className='text-sm text-muted-foreground'>更新于 {new Date(template.updatedAt).toLocaleDateString()}</p>
               </CardHeader>
               <CardContent>
                 <div className='flex items-center gap-2'>

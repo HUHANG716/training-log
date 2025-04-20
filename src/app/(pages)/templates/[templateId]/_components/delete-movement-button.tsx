@@ -16,7 +16,7 @@ function useDeleteMovement(templateId: number) {
 
   return api.movement.delete.useMutation({
     onSuccess: async () => {
-      await utils.action.getByTemplateId.invalidate({ templateId });
+      await utils.template.getById.invalidate({ id: templateId });
       toast.success('运动记录删除成功');
     },
     onError: (e) => {
